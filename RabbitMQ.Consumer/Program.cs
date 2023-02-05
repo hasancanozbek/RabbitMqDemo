@@ -11,7 +11,7 @@ using IConnection connection = factory.CreateConnection();
 using IModel channel = connection.CreateModel();
 
 //create queue
-channel.QueueDeclare(queue: "example-queue", exclusive: false);
+channel.QueueDeclare(queue: "example-queue", exclusive: false, durable:true);
 /*
  * The consumer's queue and publisher's queue must be in the same configuration.
  */
@@ -19,6 +19,8 @@ channel.QueueDeclare(queue: "example-queue", exclusive: false);
 //read message from queue
 EventingBasicConsumer consumer = new(channel);
 var consumerTag = channel.BasicConsume(queue: "example-queue", autoAck: false, consumer: consumer);
+
+channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global:true) ;
 consumer.Received += (sender, e) =>
 {
     /*

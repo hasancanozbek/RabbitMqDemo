@@ -10,7 +10,9 @@ using IConnection connection = factory.CreateConnection();
 using IModel channel = connection.CreateModel();
 
 //create queue
-channel.QueueDeclare(queue: "example-queue", exclusive: false);
+channel.QueueDeclare(queue: "example-queue", exclusive: false, durable: true);
+IBasicProperties properties = channel.CreateBasicProperties();
+properties.Persistent = true;
 
 //send message to queue
 /*
@@ -19,7 +21,7 @@ channel.QueueDeclare(queue: "example-queue", exclusive: false);
 for (int i = 1; i < 100; i++)
 {
     byte[] message = Encoding.UTF8.GetBytes($"Hello world - {i}");
-    channel.BasicPublish(exchange: "", routingKey: "example-queue", body: message);
+    channel.BasicPublish(exchange: "", routingKey: "example-queue", body: message, basicProperties: properties);
     Console.WriteLine($"Message {i} send");
 }
 
