@@ -3,22 +3,22 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 
-ConnectionFactory factory = new ();
+ConnectionFactory factory = new();
 factory.HostName = "localhost";
 
 //activate connection and create channel
 using IConnection connection = factory.CreateConnection();
-using IModel channel = connection.CreateModel ();
+using IModel channel = connection.CreateModel();
 
 //create queue
-channel.QueueDeclare(queue: "example-queue", exclusive:false);
+channel.QueueDeclare(queue: "example-queue", exclusive: false);
 /*
- * The consumer's queue and publisher's queue must be in the same configuration. 
+ * The consumer's queue and publisher's queue must be in the same configuration.
  */
 
 //read message from queue
 EventingBasicConsumer consumer = new(channel);
-channel.BasicConsume(queue:"example-queue", autoAck: false, consumer: consumer);
+var consumerTag = channel.BasicConsume(queue: "example-queue", autoAck: false, consumer: consumer);
 consumer.Received += (sender, e) =>
 {
     /*
@@ -31,11 +31,16 @@ consumer.Received += (sender, e) =>
 
     /*
      * multiple : send signal for all messages sent before the processed message
-     * requeue : specifies whether to add the reported message back to the queue.
+     * requeue : specifies whether to add the reported message back to the queue
      * BasicNack :  indicates that the message will not be processed
      * BascicAck : indicates that the message processed
+     * BasicCancel : indicates that all messages in the queue will be canceled
+     * BasicReject : reject the message to be processed in the queue
      */
-    channel.BasicNack(deliveryTag: e.DeliveryTag, multiple: false, requeue: false);
+    //channel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
+    //channel.BasicNack(deliveryTag: e.DeliveryTag, multiple: false, requeue: false);
+    //channel.BasicCancel(consumerTag: consumerTag);
+    channel.BasicReject(deliveryTag: 3, requeue: true);
 };
 
 Console.Read();
