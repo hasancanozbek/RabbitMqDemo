@@ -18,7 +18,7 @@ channel.QueueDeclare(queue: "example-queue", exclusive:false);
 
 //read message from queue
 EventingBasicConsumer consumer = new(channel);
-channel.BasicConsume("example-queue", false, consumer);
+channel.BasicConsume(queue:"example-queue", autoAck: false, consumer: consumer);
 consumer.Received += (sender, e) =>
 {
     /*
@@ -26,8 +26,9 @@ consumer.Received += (sender, e) =>
      * e.Body : get in the queue message's complete data 
      * e.Body.Span or e.Body.ToArray() : get in the queue message's byte data
      */
-
+    Thread.Sleep(1000);
     Console.WriteLine(Encoding.UTF8.GetString(e.Body.Span));
+    channel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
 };
 
 Console.Read();
