@@ -9,6 +9,40 @@ factory.HostName = "localhost";
 using IConnection connection = factory.CreateConnection();
 using IModel channel = connection.CreateModel();
 
+#region Direct Exchange
+
+//channel.ExchangeDeclare(exchange:"direct-exchange-example", type:ExchangeType.Direct);
+
+//while (true)
+//{
+//    Console.Write("Message : ");
+//    string message = Console.ReadLine();
+//    byte[] byteMessage = Encoding.UTF8.GetBytes(message);
+
+//    channel.BasicPublish(exchange:"direct-exchange-example",
+//        routingKey:"direct-queue-example",
+//        body:byteMessage);
+//}
+
+#endregion
+
+#region Fanout Exchange
+
+channel.ExchangeDeclare(
+    exchange: "fanout-exchange-example",
+    type: ExchangeType.Fanout);
+for (int i = 0; i < 100; i++)
+{
+    await Task.Delay(200);
+    byte[] message = Encoding.UTF8.GetBytes($"Hello {i}");
+    channel.BasicPublish(
+        exchange: "fanout-exchange-example",
+        routingKey: string.Empty,
+        body: message);
+}
+
+#endregion
+
 ////create queue
 //channel.QueueDeclare(queue: "example-queue", exclusive: false, durable: true);
 //IBasicProperties properties = channel.CreateBasicProperties();
@@ -26,17 +60,5 @@ using IModel channel = connection.CreateModel();
 //    Console.WriteLine($"Message {i} send");
 //}
 
-channel.ExchangeDeclare(exchange:"direct-exchange-example", type:ExchangeType.Direct);
-
-while (true)
-{
-    Console.Write("Message : ");
-    string message = Console.ReadLine();
-    byte[] byteMessage = Encoding.UTF8.GetBytes(message);
-
-    channel.BasicPublish(exchange:"direct-exchange-example",
-        routingKey:"direct-queue-example",
-        body:byteMessage);
-}
 
 Console.Read();
