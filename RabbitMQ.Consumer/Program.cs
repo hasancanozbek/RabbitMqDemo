@@ -80,6 +80,35 @@ using IModel channel = connection.CreateModel();
 
 #endregion
 
+#region Header Exhange
+
+//channel.ExchangeDeclare(
+//    exchange: "header-exchange-example",
+//    type: ExchangeType.Headers);
+//Console.Write("Please enter header value : ");
+//string value = Console.ReadLine();
+//string queueName = channel.QueueDeclare().QueueName;
+//channel.QueueBind(
+//    queue:queueName,
+//    exchange: "header-exchange-example",
+//    routingKey: string.Empty,
+//    new Dictionary<string, object>
+//    {
+//        ["no"] = value
+//    });
+//EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
+//channel.BasicConsume(
+//    queue: queueName,
+//    autoAck: true,
+//    consumer: consumer);
+//consumer.Received += (sender, e) =>
+//{
+//string message = Encoding.UTF8.GetString(e.Body.Span);
+//Console.WriteLine(message);
+//};
+
+#endregion
+
 //create queue
 //channel.QueueDeclare(queue: "example-queue", exclusive: false, durable:true);
 /*
