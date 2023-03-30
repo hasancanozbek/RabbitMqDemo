@@ -28,18 +28,37 @@ using IModel channel = connection.CreateModel();
 
 #region Fanout Exchange
 
-channel.ExchangeDeclare(
-    exchange: "fanout-exchange-example",
-    type: ExchangeType.Fanout);
-for (int i = 0; i < 100; i++)
-{
-    await Task.Delay(200);
-    byte[] message = Encoding.UTF8.GetBytes($"Hello {i}");
-    channel.BasicPublish(
-        exchange: "fanout-exchange-example",
-        routingKey: string.Empty,
-        body: message);
-}
+//channel.ExchangeDeclare(
+//    exchange: "fanout-exchange-example",
+//    type: ExchangeType.Fanout);
+//for (int i = 0; i < 100; i++)
+//{
+//    await Task.Delay(200);
+//    byte[] message = Encoding.UTF8.GetBytes($"Hello {i}");
+//    channel.BasicPublish(
+//        exchange: "fanout-exchange-example",
+//        routingKey: string.Empty,
+//        body: message);
+//}
+
+#endregion
+
+#region Topic Exchange
+
+//channel.ExchangeDeclare(
+//    exchange: "topic-exchange-example",
+//    type: ExchangeType.Topic);
+//for (int i = 0; i < 100; i++)
+//{
+//    await Task.Delay(200);
+//    byte[] message = Encoding.UTF8.GetBytes($"Message {i} recieved.");
+//    Console.WriteLine("Please choose topic for queue : ");
+//    string topic = Console.ReadLine();
+//    channel.BasicPublish(
+//        exchange: "topic-exchange-example",
+//        routingKey: topic,
+//        body: message);
+//}
 
 #endregion
 

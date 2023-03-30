@@ -30,31 +30,55 @@ using IModel channel = connection.CreateModel();
 
 #region Fanout Exchange
 
-channel.ExchangeDeclare(
-    exchange: "fanout-exchange-example",
-    type: ExchangeType.Fanout);
-Console.Write("Enter a queue name : ");
-string queueName = Console.ReadLine();
-channel.QueueDeclare(
-    queue: queueName,
-    exclusive: false);
-channel.QueueBind(
-    queue:queueName,
-    exchange: "fanout-exchange-example",
-    routingKey: string.Empty);
-EventingBasicConsumer consumer = new(channel);
-channel.BasicConsume(
-    queue: queueName,
-    autoAck:true,
-    consumer:consumer);
-consumer.Received += (sender, e) =>
-{
-    string message = Encoding.UTF8.GetString(e.Body.Span);
-    Console.WriteLine(message);
-};
+//channel.ExchangeDeclare(
+//    exchange: "fanout-exchange-example",
+//    type: ExchangeType.Fanout);
+//Console.Write("Enter a queue name : ");
+//string queueName = Console.ReadLine();
+//channel.QueueDeclare(
+//    queue: queueName,
+//    exclusive: false);
+//channel.QueueBind(
+//    queue:queueName,
+//    exchange: "fanout-exchange-example",
+//    routingKey: string.Empty);
+//EventingBasicConsumer consumer = new(channel);
+//channel.BasicConsume(
+//    queue: queueName,
+//    autoAck:true,
+//    consumer:consumer);
+//consumer.Received += (sender, e) =>
+//{
+//    string message = Encoding.UTF8.GetString(e.Body.Span);
+//    Console.WriteLine(message);
+//};
 
 #endregion
 
+#region Topic Exchange
+
+//channel.ExchangeDeclare(
+//    exchange: "topic-exchange-example",
+//    type: ExchangeType.Topic);
+//Console.Write("Specify the format of the topic to be listened to : ");
+//string topic = Console.ReadLine();
+//string queueName = channel.QueueDeclare().QueueName;
+//channel.QueueBind(
+//    queue: queueName,
+//    exchange: "topic-exchange-example",
+//    routingKey: topic);
+//EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
+//channel.BasicConsume(
+//    queue: queueName,
+//    autoAck: true,
+//    consumer);
+//consumer.Received += (sender, e) =>
+//{
+//    string message = Encoding.UTF8.GetString(e.Body.Span);
+//    Console.WriteLine(message);
+//};
+
+#endregion
 
 //create queue
 //channel.QueueDeclare(queue: "example-queue", exclusive: false, durable:true);
