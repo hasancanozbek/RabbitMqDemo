@@ -1,11 +1,9 @@
 ﻿using RabbitMQ.Client;
 using System.Text;
 
-//create connection
 ConnectionFactory factory = new();
 factory.HostName = "localhost";
 
-//activate connection and create channel
 using IConnection connection = factory.CreateConnection();
 using IModel channel = connection.CreateModel();
 
@@ -87,22 +85,37 @@ using IModel channel = connection.CreateModel();
 
 #endregion
 
-////create queue
-//channel.QueueDeclare(queue: "example-queue", exclusive: false, durable: true);
-//IBasicProperties properties = channel.CreateBasicProperties();
-//properties.Persistent = true;
 
-//send message to queue
-/*
- * RabbitMQ accept messages only byte type. So we have to convert messages to bytes.
- */
 
-//for (int i = 1; i < 100; i++)
-//{
-//    byte[] message = Encoding.UTF8.GetBytes($"Hello world - {i}");
-//    channel.BasicPublish(exchange: "", routingKey: "example-queue", body: message, basicProperties: properties);
-//    Console.WriteLine($"Message {i} send");
-//}
+#region Point To Point (P2P) Pattern
 
+string queueName = "example-p2p-queue";
+
+channel.QueueDeclare(
+    queue: queueName,
+    durable: false,
+    exclusive: false,
+    autoDelete: false);
+
+byte[] message = Encoding.UTF8.GetBytes("Hello!");
+
+channel.BasicPublish(
+    exchange: string.Empty,
+    routingKey: queueName,
+    body: message);
+
+#endregion
+
+#region Publish/Subscribe (Pub/Sub) Pattern
+
+#endregion
+
+#region Work Queue Pattern
+
+#endregion
+
+#region Request/Response Pattern
+
+#endregion
 
 Console.Read();
