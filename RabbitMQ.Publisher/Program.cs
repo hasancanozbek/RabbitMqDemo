@@ -108,26 +108,47 @@ using IModel channel = connection.CreateModel();
 
 #region Publish/Subscribe (Pub/Sub) Pattern
 
-string exchangeName = "example-pub-sub-exchange";
+//string exchangeName = "example-pub-sub-exchange";
 
-channel.ExchangeDeclare(
-    exchange: exchangeName,
-    type: ExchangeType.Fanout);
+//channel.ExchangeDeclare(
+//    exchange: exchangeName,
+//    type: ExchangeType.Fanout);
 
 
-for (int i = 0; i < 100; i++)
-{
-    byte[] message = Encoding.UTF8.GetBytes("Hello!");
-    await Task.Delay(200);
+//for (int i = 0; i < 100; i++)
+//{
+//    byte[] message = Encoding.UTF8.GetBytes("Hello!");
+//    await Task.Delay(200);
 
-    channel.BasicPublish(exchange: exchangeName,
-        routingKey: string.Empty,
-        body: message);
-}
+//    channel.BasicPublish(exchange: exchangeName,
+//        routingKey: string.Empty,
+//        body: message);
+//}
 
 #endregion
 
 #region Work Queue Pattern
+
+string queueName = "example-work-queue";
+
+channel.QueueDeclare(
+    queue: queueName,
+    durable: false,
+    exclusive: false,
+    autoDelete: false);
+
+for (int i = 0; i < 100; i++)
+{
+    await Task.Delay(200);
+
+    byte[] message = Encoding.UTF8.GetBytes($"Message {i}");
+
+    channel.BasicPublish(
+        exchange: string.Empty,
+        routingKey: queueName,
+        body: message);
+
+}
 
 #endregion
 
