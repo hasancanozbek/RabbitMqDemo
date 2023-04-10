@@ -112,15 +112,44 @@ using IModel channel = connection.CreateModel();
 
 #region Point To Point (P2P) Pattern
 
-string queueName = "example-p2p-queue";
+//string queueName = "example-p2p-queue";
 
-channel.QueueDeclare(
+//channel.QueueDeclare(
+//    queue: queueName,
+//    durable: false,
+//    exclusive: false,
+//    autoDelete: false);
+
+//EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
+//channel.BasicConsume(
+//    queue: queueName,
+//    autoAck: false,
+//    consumer: consumer);
+
+//consumer.Received += (sender, e) =>
+//{
+//    Console.WriteLine(Encoding.UTF8.GetString(e.Body.Span));
+//};
+
+#endregion
+
+#region Publish/Subscribe (Pub/Sub) Pattern
+
+string exchangeName = "example-pub-sub-exchange";
+
+channel.ExchangeDeclare(
+    exchange: exchangeName,
+    type: ExchangeType.Fanout);
+
+string queueName = channel.QueueDeclare().QueueName;
+
+channel.QueueBind(
     queue: queueName,
-    durable: false,
-    exclusive: false,
-    autoDelete: false);
+    exchange: exchangeName,
+    routingKey: string.Empty
+    );
 
-EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
+EventingBasicConsumer consumer = new(channel);
 channel.BasicConsume(
     queue: queueName,
     autoAck: false,
@@ -130,10 +159,6 @@ consumer.Received += (sender, e) =>
 {
     Console.WriteLine(Encoding.UTF8.GetString(e.Body.Span));
 };
-
-#endregion
-
-#region Publish/Subscribe (Pub/Sub) Pattern
 
 #endregion
 

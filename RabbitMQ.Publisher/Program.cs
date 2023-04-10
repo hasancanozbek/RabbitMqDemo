@@ -89,24 +89,41 @@ using IModel channel = connection.CreateModel();
 
 #region Point To Point (P2P) Pattern
 
-string queueName = "example-p2p-queue";
+//string queueName = "example-p2p-queue";
 
-channel.QueueDeclare(
-    queue: queueName,
-    durable: false,
-    exclusive: false,
-    autoDelete: false);
+//channel.QueueDeclare(
+//    queue: queueName,
+//    durable: false,
+//    exclusive: false,
+//    autoDelete: false);
 
-byte[] message = Encoding.UTF8.GetBytes("Hello!");
+//byte[] message = Encoding.UTF8.GetBytes("Hello!");
 
-channel.BasicPublish(
-    exchange: string.Empty,
-    routingKey: queueName,
-    body: message);
+//channel.BasicPublish(
+//    exchange: string.Empty,
+//    routingKey: queueName,
+//    body: message);
 
 #endregion
 
 #region Publish/Subscribe (Pub/Sub) Pattern
+
+string exchangeName = "example-pub-sub-exchange";
+
+channel.ExchangeDeclare(
+    exchange: exchangeName,
+    type: ExchangeType.Fanout);
+
+
+for (int i = 0; i < 100; i++)
+{
+    byte[] message = Encoding.UTF8.GetBytes("Hello!");
+    await Task.Delay(200);
+
+    channel.BasicPublish(exchange: exchangeName,
+        routingKey: string.Empty,
+        body: message);
+}
 
 #endregion
 
