@@ -164,33 +164,64 @@ using IModel channel = connection.CreateModel();
 
 #region Work Queue Pattern
 
-string queueName = "example-work-queue";
+//string queueName = "example-work-queue";
 
-channel.QueueDeclare(
-    queue: queueName,
-    durable: false,
-    exclusive: false,
-    autoDelete: false);
+//channel.QueueDeclare(
+//    queue: queueName,
+//    durable: false,
+//    exclusive: false,
+//    autoDelete: false);
 
-EventingBasicConsumer consumer = new (channel);
-channel.BasicConsume(
-    queue: queueName,
-    autoAck: true,
-    consumer: consumer);
+//EventingBasicConsumer consumer = new (channel);
+//channel.BasicConsume(
+//    queue: queueName,
+//    autoAck: true,
+//    consumer: consumer);
 
-channel.BasicQos(
-    prefetchCount: 1,
-    prefetchSize: 0,
-    global: false);
+//channel.BasicQos(
+//    prefetchCount: 1,
+//    prefetchSize: 0,
+//    global: false);
 
-consumer.Received += (sender, e) =>
-{
-    Console.WriteLine(Encoding.UTF8.GetString(e.Body.Span));
-};
+//consumer.Received += (sender, e) =>
+//{
+//    Console.WriteLine(Encoding.UTF8.GetString(e.Body.Span));
+//};
 
 #endregion
 
 #region Request/Response Pattern
+
+string requestQueueName = "example-request-queque";
+channel.QueueDeclare(
+    queue: requestQueueName,
+    durable: false,
+    exclusive: false,
+    autoDelete: false);
+
+EventingBasicConsumer consumer = new(channel);
+channel.BasicConsume(
+    queue: requestQueueName,
+    autoAck: true,
+    consumer: consumer);
+
+consumer.Received += (sender, e) =>
+{
+    string message = Encoding.UTF8.GetString(e.Body.Span);
+    Console.WriteLine(message);
+
+    byte[] responseMessage = Encoding.UTF8.GetBytes($"Process completed : {message}");
+
+    IBasicProperties properties = channel.CreateBasicProperties();
+    properties.CorrelationId = e.BasicProperties.CorrelationId;
+
+    channel.BasicPublish(
+        exchange: string.Empty,
+        routingKey: e.BasicProperties.ReplyTo,
+        basicProperties: properties,
+        body: responseMessage);
+
+};
 
 #endregion
 

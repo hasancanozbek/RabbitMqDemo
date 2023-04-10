@@ -1,4 +1,5 @@
 ﻿using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using System.Text;
 
 ConnectionFactory factory = new();
@@ -129,30 +130,71 @@ using IModel channel = connection.CreateModel();
 
 #region Work Queue Pattern
 
-string queueName = "example-work-queue";
+//string queueName = "example-work-queue";
 
-channel.QueueDeclare(
-    queue: queueName,
-    durable: false,
-    exclusive: false,
-    autoDelete: false);
+//channel.QueueDeclare(
+//    queue: queueName,
+//    durable: false,
+//    exclusive: false,
+//    autoDelete: false);
 
-for (int i = 0; i < 100; i++)
-{
-    await Task.Delay(200);
+//for (int i = 0; i < 100; i++)
+//{
+//    await Task.Delay(200);
 
-    byte[] message = Encoding.UTF8.GetBytes($"Message {i}");
+//    byte[] message = Encoding.UTF8.GetBytes($"Message {i}");
 
-    channel.BasicPublish(
-        exchange: string.Empty,
-        routingKey: queueName,
-        body: message);
-
-}
+//    channel.BasicPublish(
+//        exchange: string.Empty,
+//        routingKey: queueName,
+//        body: message);
+//}
 
 #endregion
 
 #region Request/Response Pattern
+
+string requestQueueName = "example-request-queque";
+channel.QueueDeclare(
+    queue: requestQueueName,
+    durable: false,
+    exclusive: false,
+    autoDelete: false);
+
+string replyQueueName = channel.QueueDeclare().QueueName;
+
+string correlationId = Guid.NewGuid().ToString();
+
+//Generate & Send Request Message
+IBasicProperties properties = channel.CreateBasicProperties();
+properties.CorrelationId = correlationId;
+properties.ReplyTo = replyQueueName;
+
+for (int i = 0; i < 10; i++)
+{
+    byte[] message = Encoding.UTF8.GetBytes("Hello" + i);
+
+    channel.BasicPublish(
+        exchange: string.Empty,
+        routingKey: requestQueueName,
+        body: message,
+        basicProperties: properties);
+}
+
+//Listening Response Queue
+EventingBasicConsumer consumer = new(channel);
+channel.BasicConsume(
+    queue: replyQueueName,
+    autoAck: true,
+    consumer: consumer);
+
+consumer.Received += (sender, e) =>
+{
+    if (e.BasicProperties.CorrelationId == correlationId)
+    {
+        Console.WriteLine($"response : {Encoding.UTF8.GetString(e.Body.Span)}");
+    }
+};
 
 #endregion
 
