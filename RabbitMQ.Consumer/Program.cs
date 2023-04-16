@@ -192,36 +192,36 @@ using IModel channel = connection.CreateModel();
 
 #region Request/Response Pattern
 
-string requestQueueName = "example-request-queque";
-channel.QueueDeclare(
-    queue: requestQueueName,
-    durable: false,
-    exclusive: false,
-    autoDelete: false);
+//string requestQueueName = "example-request-queque";
+//channel.QueueDeclare(
+//    queue: requestQueueName,
+//    durable: false,
+//    exclusive: false,
+//    autoDelete: false);
 
-EventingBasicConsumer consumer = new(channel);
-channel.BasicConsume(
-    queue: requestQueueName,
-    autoAck: true,
-    consumer: consumer);
+//EventingBasicConsumer consumer = new(channel);
+//channel.BasicConsume(
+//    queue: requestQueueName,
+//    autoAck: true,
+//    consumer: consumer);
 
-consumer.Received += (sender, e) =>
-{
-    string message = Encoding.UTF8.GetString(e.Body.Span);
-    Console.WriteLine(message);
+//consumer.Received += (sender, e) =>
+//{
+//    string message = Encoding.UTF8.GetString(e.Body.Span);
+//    Console.WriteLine(message);
 
-    byte[] responseMessage = Encoding.UTF8.GetBytes($"Process completed : {message}");
+//    byte[] responseMessage = Encoding.UTF8.GetBytes($"Process completed : {message}");
 
-    IBasicProperties properties = channel.CreateBasicProperties();
-    properties.CorrelationId = e.BasicProperties.CorrelationId;
+//    IBasicProperties properties = channel.CreateBasicProperties();
+//    properties.CorrelationId = e.BasicProperties.CorrelationId;
 
-    channel.BasicPublish(
-        exchange: string.Empty,
-        routingKey: e.BasicProperties.ReplyTo,
-        basicProperties: properties,
-        body: responseMessage);
+//    channel.BasicPublish(
+//        exchange: string.Empty,
+//        routingKey: e.BasicProperties.ReplyTo,
+//        basicProperties: properties,
+//        body: responseMessage);
 
-};
+//};
 
 #endregion
 

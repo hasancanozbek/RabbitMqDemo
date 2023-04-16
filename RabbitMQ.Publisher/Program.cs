@@ -154,47 +154,47 @@ using IModel channel = connection.CreateModel();
 
 #region Request/Response Pattern
 
-string requestQueueName = "example-request-queque";
-channel.QueueDeclare(
-    queue: requestQueueName,
-    durable: false,
-    exclusive: false,
-    autoDelete: false);
+//string requestQueueName = "example-request-queque";
+//channel.QueueDeclare(
+//    queue: requestQueueName,
+//    durable: false,
+//    exclusive: false,
+//    autoDelete: false);
 
-string replyQueueName = channel.QueueDeclare().QueueName;
+//string replyQueueName = channel.QueueDeclare().QueueName;
 
-string correlationId = Guid.NewGuid().ToString();
+//string correlationId = Guid.NewGuid().ToString();
 
-//Generate & Send Request Message
-IBasicProperties properties = channel.CreateBasicProperties();
-properties.CorrelationId = correlationId;
-properties.ReplyTo = replyQueueName;
+////Generate & Send Request Message
+//IBasicProperties properties = channel.CreateBasicProperties();
+//properties.CorrelationId = correlationId;
+//properties.ReplyTo = replyQueueName;
 
-for (int i = 0; i < 10; i++)
-{
-    byte[] message = Encoding.UTF8.GetBytes("Hello" + i);
+//for (int i = 0; i < 10; i++)
+//{
+//    byte[] message = Encoding.UTF8.GetBytes("Hello" + i);
 
-    channel.BasicPublish(
-        exchange: string.Empty,
-        routingKey: requestQueueName,
-        body: message,
-        basicProperties: properties);
-}
+//    channel.BasicPublish(
+//        exchange: string.Empty,
+//        routingKey: requestQueueName,
+//        body: message,
+//        basicProperties: properties);
+//}
 
-//Listening Response Queue
-EventingBasicConsumer consumer = new(channel);
-channel.BasicConsume(
-    queue: replyQueueName,
-    autoAck: true,
-    consumer: consumer);
+////Listening Response Queue
+//EventingBasicConsumer consumer = new(channel);
+//channel.BasicConsume(
+//    queue: replyQueueName,
+//    autoAck: true,
+//    consumer: consumer);
 
-consumer.Received += (sender, e) =>
-{
-    if (e.BasicProperties.CorrelationId == correlationId)
-    {
-        Console.WriteLine($"response : {Encoding.UTF8.GetString(e.Body.Span)}");
-    }
-};
+//consumer.Received += (sender, e) =>
+//{
+//    if (e.BasicProperties.CorrelationId == correlationId)
+//    {
+//        Console.WriteLine($"response : {Encoding.UTF8.GetString(e.Body.Span)}");
+//    }
+//};
 
 #endregion
 
